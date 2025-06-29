@@ -118,7 +118,8 @@
     function goToReport() {
            // 현재 페이지의 프로토콜, 호스트(IP 또는 localhost), 포트 사용
            const host = window.location.protocol + "//" + window.location.host;
-           window.location.href = host + "/report";
+            const username = encodeURIComponent(document.getElementById('username').value.trim());
+            window.location.href = `${host}/report?id=${username}`;
        }
 
    function validateForm() {
