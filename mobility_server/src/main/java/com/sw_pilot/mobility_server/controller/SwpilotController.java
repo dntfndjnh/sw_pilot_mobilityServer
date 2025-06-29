@@ -14,7 +14,7 @@ public class SwpilotController {
         return "report";
     }
 
-    @RestController // 중요: @Controller + @ResponseBody 기능
+    @RestController
     public class EchoController {
 
         @GetMapping("/test")
