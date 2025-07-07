@@ -124,9 +124,13 @@
     });
 
 
-    function showAlertAndOpenPlayPage() {
-            alert("영상을 재생합니다.");
-            window.open('/play', 'playWindow', 'width=800,height=600');
+      function showAlertAndOpenPlayPage() {
+            const result = confirm("영상을 재생하시겠습니까?");
+            if (result) {
+                // '확인' 클릭 시 새창으로 play.html 열기
+                window.open('/play', 'playWindow', 'width=800,height=600');
+            }
+            // '취소' 클릭 시 아무 동작하지 않음
         };
 </script>
 
