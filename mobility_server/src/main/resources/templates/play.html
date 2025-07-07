@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>알림 후 새창 띄우기</title>
+    <script>
+        function showAlertAndOpenPlayPage() {
+            alert("영상을 재생합니다.");
+            window.open('/play', 'playWindow', 'width=800,height=600');
+        }
+
+        // 페이지 로드시 자동 실행하고 싶다면 아래 주석 해제
+        // window.onload = showAlertAndOpenPlayPage;
+    </script>
+</head>
+<body>
+<h1>메인 페이지</h1>
+<p>아래 버튼을 클릭하면 play.html을 새창으로 띄웁니다.</p>
+<button onclick="showAlertAndOpenPlayPage()">영상 재생 시작</button>
+</body>
+</html>

@@ -47,4 +47,11 @@ public class SwpilotController {
         return "report"; // src/main/resources/templates/report.html
     }
 
+
+    @GetMapping("/play")
+    public String play() {
+        return "play";
+    }
+
+
 }

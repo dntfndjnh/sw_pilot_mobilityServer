@@ -122,6 +122,12 @@
         };
         html2pdf().set(opt).from(element).save();
     });
+
+
+    function showAlertAndOpenPlayPage() {
+            alert("영상을 재생합니다.");
+            window.open('/play', 'playWindow', 'width=800,height=600');
+        };
 </script>
 
 </body>
