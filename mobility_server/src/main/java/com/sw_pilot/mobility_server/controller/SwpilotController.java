@@ -1,11 +1,13 @@
 package com.sw_pilot.mobility_server.controller;
 
+import com.sw_pilot.mobility_server.domain.Data;
 import com.sw_pilot.mobility_server.domain.ReportItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
 public class SwpilotController {
@@ -52,6 +54,27 @@ public class SwpilotController {
     public String play() {
         return "play";
     }
+
+
+    @RestController
+    @RequestMapping("/api")
+    public class DataController {
+
+        private final Map<String, Integer> itemCounts = new ConcurrentHashMap<>();
+
+        @PostMapping("/send")
+        public String receiveData(@RequestBody Data data) {
+            itemCounts.merge(data.getItemName(), data.getValue(), Integer::sum);
+            System.out.println("Received itemName: " + data.getItemName() + ", get_value: " + data.getValue() + ", current count: " + itemCounts.get(data.getItemName()));
+            return "Data received: " + data.getItemName() + " = " + data.getValue() + ", current total for this item = " + itemCounts.get(data.getItemName());
+        }
+
+        @GetMapping("/totals")
+        public Map<String, Integer> getAllTotals() {
+            return itemCounts;
+        }
+    }
+
 
 
 }
