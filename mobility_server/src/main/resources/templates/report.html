@@ -77,15 +77,20 @@
             zoneTbody.innerHTML = '';
 
             zoneData.forEach(entry => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${entry.areaName}</td>
-                    <td>${entry.itemName}</td>
-                    <td>${entry.areaName}에서 ${entry.itemName} 발생</td>
-                    <td>${entry.value}</td>
-                `;
-                zoneTbody.appendChild(tr);
-            });
+    const tr = document.createElement('tr');
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    const ss = String(now.getSeconds()).padStart(2,'0');
+
+    tr.innerHTML = `
+        <td>${entry.areaName}</td>
+        <td>${entry.itemName}</td>
+        <td>${hh}시 ${mm}분 ${ss}초에 ${entry.areaName}에서 ${entry.itemName} 발생</td>
+        <td>${entry.value}</td>
+    `;
+    zoneTbody.appendChild(tr);
+    });
 
             const totalResponse = await fetch('/api/totals');
             const totalData = await totalResponse.json();
