@@ -1,12 +1,17 @@
 import requests
 
-url = "http://localhost:8080/api/send"
+def send(itemName,value,areaName):
+    url = "http://localhost:8080/api/send"
 
-data = {
-    "itemName": "smoke",
-    "value": 1,
-    "areaName": "Zone A"   # 구역 이름 추가
-}
+    data = {
+        "itemName": itemName,
+        "value": 1,
+        "areaName": areaName   # 구역 이름 추가
+    }
 
-response = requests.post(url, json=data)
-print(response.text)
+    response = requests.post(url, json=data)
+    print(response.text)
+
+
+send("smoke",1,"Zone B")
+
