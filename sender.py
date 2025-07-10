@@ -3,7 +3,7 @@ import requests
 url = "http://localhost:8080/api/send"
 
 data = {
-    "itemName": "smoke",
+    "itemName": "cut",
     "value": 1
 }
 
