@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,9 +68,12 @@ public class SwpilotController {
 
         @PostMapping("/send")
         public String receiveData(@RequestBody Data data) {
+            LocalDateTime now = LocalDateTime.now();
+            String time = now.format(DateTimeFormatter.ofPattern("HH시 mm분 ss초"));
+            data.setTime(time);
             dataList.add(data);
             itemCounts.merge(data.getItemName(), data.getValue(), Integer::sum);
-            return "Received " + data.getAreaName() + " - " + data.getItemName() + " = " + data.getValue();
+            return "Received " + data.getAreaName() + " - " + data.getItemName() + " = " + data.getValue() + " at " + time;
         }
 
         @GetMapping("/zone-totals")
