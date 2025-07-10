@@ -116,6 +116,40 @@
         };
         html2pdf().set(opt).from(element).save();
     });
+
+    setInterval(async () => {
+    try {
+        const zoneResponse = await fetch('/api/zone-totals');
+        const zoneData = await zoneResponse.json();
+        const zoneTbody = document.getElementById('zoneTableBody');
+        zoneTbody.innerHTML = '';
+        zoneData.forEach(entry => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${entry.areaName}</td>
+                <td>${entry.itemName}</td>
+                <td>${entry.time}에 ${entry.areaName}에서 ${entry.itemName} 발생</td>
+                <td>${entry.value}</td>
+            `;
+            zoneTbody.appendChild(tr);
+        });
+
+        const totalResponse = await fetch('/api/totals');
+        const totalData = await totalResponse.json();
+        const totalTbody = document.getElementById('totalTableBody');
+        totalTbody.innerHTML = '';
+        Object.entries(totalData).forEach(([item, value]) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item}</td>
+                <td>${value}</td>
+            `;
+            totalTbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error('자동 갱신 중 오류:', error);
+    }
+}, 3000); // 3초마다 자동 갱신
 </script>
 
 </body>
