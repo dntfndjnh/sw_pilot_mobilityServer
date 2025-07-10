@@ -4,52 +4,14 @@
     <meta charset="UTF-8" />
     <title>보고서</title>
     <style>
-        /* 기존 CSS 유지 */
-        body {
-          font-family: 'Malgun Gothic', Arial, sans-serif;
-          margin: 40px auto;
-          max-width: 900px;
-          color: #333;
-          line-height: 1.6;
-          background: #f9f9f9;
-        }
-        h1, h2, h3 {
-          color: #2c3e50;
-          border-bottom: 2px solid #2980b9;
-          padding-bottom: 6px;
-        }
-        h1 { font-size: 2.2em; margin-bottom: 0.3em; }
-        h2 { font-size: 1.6em; margin-top: 1.5em; }
-        table {
-          border-collapse: collapse;
-          width: 100%;
-          margin-top: 1em;
-          margin-bottom: 2em;
-        }
-        th, td {
-          border: 1px solid #ddd;
-          padding: 8px 12px;
-          text-align: left;
-        }
+        body { font-family: 'Malgun Gothic', Arial, sans-serif; margin: 40px auto; max-width: 900px; color: #333; line-height: 1.6; background: #f9f9f9; }
+        h1, h2, h3 { color: #2c3e50; border-bottom: 2px solid #2980b9; padding-bottom: 6px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 1em; margin-bottom: 2em; }
+        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
         th { background-color: #2980b9; color: white; }
         tr:nth-child(even) { background-color: #f4f6f7; }
-        .footer {
-          margin-top: 40px;
-          font-size: 0.9em;
-          color: #888;
-          text-align: center;
-        }
-        #btnDownloadPdf {
-          background-color: #2980b9;
-          color: white;
-          border: none;
-          padding: 10px 18px;
-          font-size: 1em;
-          border-radius: 5px;
-          cursor: pointer;
-          margin-bottom: 20px;
-          float: right;
-        }
+        .footer { margin-top: 40px; font-size: 0.9em; color: #888; text-align: center; }
+        #btnDownloadPdf { background-color: #2980b9; color: white; border: none; padding: 10px 18px; font-size: 1em; border-radius: 5px; cursor: pointer; margin-bottom: 20px; float: right; }
         #btnDownloadPdf:hover { background-color: #1f618d; }
     </style>
 </head>
@@ -59,127 +21,101 @@
 
 <div id="reportContent">
     <h1>공정점검보고서</h1>
-
     <h2>작성자 정보</h2>
     <p><strong>사용자ID: </strong><span id="authorId">로딩 중...</span></p>
     <p><strong>작성일: </strong><span id="todayDate">날짜 로드 중...</span></p>
 
     <h2>AI분석</h2>
-    <p>여기에 보고서 요약 내용이 들어갑니다.</p>
+    <p>보고서 요약 내용이 여기에 표시됩니다.</p>
 
-    <h2>상세 내용</h2>
+    <h2>상세 내용 (Zone별)</h2>
     <table>
         <thead>
         <tr>
+            <th>Zone</th>
             <th>항목</th>
             <th>설명</th>
             <th>값</th>
         </tr>
         </thead>
-        <tbody>
-        <tr>
-            <td>예시 항목</td>
-            <td>예시 설명</td>
-            <td>예시 값</td>
-        </tr>
+        <tbody id="zoneTableBody">
+        <tr><td colspan="4">로딩 중...</td></tr>
         </tbody>
     </table>
 
-    <div class="footer">
-        © 2025 SWPILOT MOBILITY1. All rights reserved.
-    </div>
+    <h2>항목별 누적 합계</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>항목</th>
+            <th>누적 합계</th>
+        </tr>
+        </thead>
+        <tbody id="totalTableBody">
+        <tr><td colspan="2">로딩 중...</td></tr>
+        </tbody>
+    </table>
+
+    <div class="footer">© 2025 SWPILOT MOBILITY1. All rights reserved.</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // 오늘 날짜 입력
+    document.addEventListener('DOMContentLoaded', async () => {
         const dateSpan = document.getElementById('todayDate');
         const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        const hh = String(today.getHours()).padStart(2, '0');
-        const min = String(today.getMinutes()).padStart(2, '0');
-        dateSpan.innerText = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+        dateSpan.innerText = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')} ${String(today.getHours()).padStart(2,'0')}:${String(today.getMinutes()).padStart(2,'0')}`;
 
-        // GET 파라미터로 사용자ID 로드
         const params = new URLSearchParams(window.location.search);
         const userId = params.get('id');
         document.getElementById('authorId').innerText = userId ? userId : '알 수 없음';
+
+        try {
+            const zoneResponse = await fetch('/api/zone-totals');
+            const zoneData = await zoneResponse.json();
+            const zoneTbody = document.getElementById('zoneTableBody');
+            zoneTbody.innerHTML = '';
+
+            zoneData.forEach(entry => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${entry.areaName}</td>
+                    <td>${entry.itemName}</td>
+                    <td>${entry.areaName}에서 ${entry.itemName} 발생</td>
+                    <td>${entry.value}</td>
+                `;
+                zoneTbody.appendChild(tr);
+            });
+
+            const totalResponse = await fetch('/api/totals');
+            const totalData = await totalResponse.json();
+            const totalTbody = document.getElementById('totalTableBody');
+            totalTbody.innerHTML = '';
+
+            Object.entries(totalData).forEach(([item, value]) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item}</td>
+                    <td>${value}</td>
+                `;
+                totalTbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error('데이터 불러오기 실패:', error);
+        }
     });
 
-    // PDF 저장
     document.getElementById('btnDownloadPdf').addEventListener('click', () => {
         const element = document.getElementById('reportContent');
         const opt = {
-          margin:       0.5,
-          filename:     (document.title || 'report') + '.pdf',
-          image:        { type: 'jpeg', quality: 0.98 },
-          html2canvas:  { scale: 2 },
-          jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            margin: 0.5,
+            filename: (document.title || 'report') + '.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
         };
         html2pdf().set(opt).from(element).save();
     });
-
-
-      function showAlertAndOpenPlayPage() {
-            const result = confirm("영상을 재생하시겠습니까?");
-            if (result) {
-                // '확인' 클릭 시 새창으로 play.html 열기
-                window.open('/play', 'playWindow', 'width=800,height=600');
-            }
-            // '취소' 클릭 시 아무 동작하지 않음
-        };
-
-
-
-    document.addEventListener('DOMContentLoaded', async () => {
-    // 오늘 날짜 입력
-    const dateSpan = document.getElementById('todayDate');
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const hh = String(today.getHours()).padStart(2, '0');
-    const min = String(today.getMinutes()).padStart(2, '0');
-    dateSpan.innerText = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
-
-    // GET 파라미터로 사용자ID 로드
-    const params = new URLSearchParams(window.location.search);
-    const userId = params.get('id');
-    document.getElementById('authorId').innerText = userId ? userId : '알 수 없음';
-
-    // API에서 데이터 가져와 테이블에 동적 추가
-    try {
-        const response = await fetch('/api/totals');
-        const data = await response.json();
-        const tbody = document.querySelector('table tbody');
-        tbody.innerHTML = ''; // 기존 예시 행 제거
-
-        for (const [item, value] of Object.entries(data)) {
-            const tr = document.createElement('tr');
-
-            const tdItem = document.createElement('td');
-            tdItem.textContent = item;
-
-            const tdDesc = document.createElement('td');
-            tdDesc.textContent = item + ' 항목의 누적 값';
-
-            const tdValue = document.createElement('td');
-            tdValue.textContent = value;
-
-            tr.appendChild(tdItem);
-            tr.appendChild(tdDesc);
-            tr.appendChild(tdValue);
-
-            tbody.appendChild(tr);
-        }
-    } catch (error) {
-        console.error('데이터 불러오기 실패:', error);
-    }
-});
 </script>
 
 </body>

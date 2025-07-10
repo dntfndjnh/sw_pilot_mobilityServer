@@ -6,8 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Controller
 public class SwpilotController {
@@ -59,21 +61,27 @@ public class SwpilotController {
     @RestController
     @RequestMapping("/api")
     public class DataController {
-
+        private final List<Data> dataList = new CopyOnWriteArrayList<>();
         private final Map<String, Integer> itemCounts = new ConcurrentHashMap<>();
 
         @PostMapping("/send")
         public String receiveData(@RequestBody Data data) {
+            dataList.add(data);
             itemCounts.merge(data.getItemName(), data.getValue(), Integer::sum);
-            System.out.println("Received itemName: " + data.getItemName() + ", get_value: " + data.getValue() + ", current count: " + itemCounts.get(data.getItemName()));
-            return "Data received: " + data.getItemName() + " = " + data.getValue() + ", current total for this item = " + itemCounts.get(data.getItemName());
+            return "Received " + data.getAreaName() + " - " + data.getItemName() + " = " + data.getValue();
+        }
+
+        @GetMapping("/zone-totals")
+        public List<Data> getZoneTotals() {
+            return dataList;
         }
 
         @GetMapping("/totals")
-        public Map<String, Integer> getAllTotals() {
+        public Map<String, Integer> getItemTotals() {
             return itemCounts;
         }
     }
+
 
 
 
