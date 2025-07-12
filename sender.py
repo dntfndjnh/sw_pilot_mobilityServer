@@ -1,6 +1,6 @@
 import requests
 
-def send(itemName,value,areaName):
+def send(itemName,areaName):
     url = "http://localhost:8080/api/send"
 
     data = {
@@ -13,5 +13,6 @@ def send(itemName,value,areaName):
     print(response.text)
 
 
-send("smoke",1,"Zone B")
+send("불","Zone A")
+
 

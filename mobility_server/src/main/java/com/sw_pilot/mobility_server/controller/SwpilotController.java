@@ -73,6 +73,7 @@ public class SwpilotController {
             data.setTime(time);
             dataList.add(data);
             itemCounts.merge(data.getItemName(), data.getValue(), Integer::sum);
+            System.out.println("Received " + data.getAreaName() + " - " + data.getItemName() + " = " + data.getValue() + " at " + time);
             return "Received " + data.getAreaName() + " - " + data.getItemName() + " = " + data.getValue() + " at " + time;
         }
 
